@@ -7,9 +7,14 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 func Connect(ctx context.Context) (*pgxpool.Pool, error) {
+	if err := godotenv.Load(); err != nil {
+
+	}
+
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		return nil, fmt.Errorf("DATABASE_URL is not set")
