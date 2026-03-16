@@ -6,27 +6,54 @@ A REST API service that watches EVM-compatible blockchain addresses and delivers
 
 - Go 1.24+
 - PostgreSQL 14+
+- Docker & Docker Compose (optional)
 
 ## Setup
 
-### 1. Clone the repository
+### Option 1 — Docker (recommended)
+```bash
+git clone https://github.com/umitaygul/evm-address-tracker.git
+cd evm-address-tracker
+```
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your values:
+```
+DATABASE_URL=postgres://evmuser:evmpass@db:5432/evmtracker?sslmode=disable
+JWT_SECRET=your-secret-key-change-this
+PORT=8080
+RPC_URL_1=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
+```
+```bash
+docker-compose up --build
+```
+
+That's it. The app and PostgreSQL start together, migrations run automatically.
+
+---
+
+### Option 2 — Manual
+
+#### 1. Clone the repository
 ```bash
 git clone https://github.com/umitaygul/evm-address-tracker.git
 cd evm-address-tracker
 ```
 
-### 2. Install dependencies
+#### 2. Install dependencies
 ```bash
 go mod download
 ```
 
-### 3. Create a PostgreSQL database
+#### 3. Create a PostgreSQL database
 ```bash
 sudo -u postgres psql -c "CREATE USER evmuser WITH PASSWORD 'evmpass';"
 sudo -u postgres psql -c "CREATE DATABASE evmtracker OWNER evmuser;"
 ```
 
-### 4. Apply migrations
+#### 4. Apply migrations
 ```bash
 psql postgres://evmuser:evmpass@localhost:5432/evmtracker?sslmode=disable \
   -f migrations/000001_init_schema.up.sql
@@ -35,7 +62,7 @@ psql postgres://evmuser:evmpass@localhost:5432/evmtracker?sslmode=disable \
   -f migrations/000002_add_webhooks_and_chain_state.up.sql
 ```
 
-### 5. Configure environment variables
+#### 5. Configure environment variables
 ```bash
 cp .env.example .env
 ```
@@ -48,7 +75,7 @@ PORT=8080
 RPC_URL_1=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
 ```
 
-### 6. Build and run
+#### 6. Build and run
 ```bash
 go run ./cmd/api
 ```
