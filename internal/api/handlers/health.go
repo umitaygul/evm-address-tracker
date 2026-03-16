@@ -23,12 +23,17 @@ func (h *HealthHandler) GetHealth(c *gin.Context) {
 
 	if err := h.db.Ping(ctx); err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"status": "db_down",
+			"status":    "unhealthy",
+			"db":        "down",
+			"timestamp": time.Now().UTC(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
+		"status":    "healthy",
+		"db":        "up",
+		"version":   "1.0.0",
+		"timestamp": time.Now().UTC(),
 	})
 }
