@@ -13,16 +13,15 @@ func NewRouter(db *pgxpool.Pool) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
 
-	// Repositories
 	userRepo := repository.NewUserRepository(db)
 	addressRepo := repository.NewAddressRepository(db)
+	webhookRepo := repository.NewWebhookRepository(db)
 
-	// Handlers
 	healthHandler := handlers.NewHealthHandler(db)
 	authHandler := handlers.NewAuthHandler(userRepo)
 	addressHandler := handlers.NewAddressHandler(addressRepo)
+	webhookHandler := handlers.NewWebhookHandler(webhookRepo)
 
-	// Public routes
 	r.GET("/health", healthHandler.GetHealth)
 
 	v1 := r.Group("/api/v1")
@@ -33,7 +32,6 @@ func NewRouter(db *pgxpool.Pool) *gin.Engine {
 			auth.POST("/login", authHandler.Login)
 		}
 
-		// Protected routes
 		protected := v1.Group("")
 		protected.Use(middleware.Auth())
 		{
@@ -43,6 +41,13 @@ func NewRouter(db *pgxpool.Pool) *gin.Engine {
 				addresses.GET("", addressHandler.List)
 				addresses.GET("/:id", addressHandler.Get)
 				addresses.DELETE("/:id", addressHandler.Delete)
+			}
+
+			webhooks := protected.Group("/webhooks")
+			{
+				webhooks.POST("", webhookHandler.Create)
+				webhooks.GET("", webhookHandler.List)
+				webhooks.DELETE("/:id", webhookHandler.Delete)
 			}
 		}
 	}
