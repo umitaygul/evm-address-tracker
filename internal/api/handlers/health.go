@@ -18,6 +18,15 @@ func NewHealthHandler(db *pgxpool.Pool) *HealthHandler {
 }
 
 func (h *HealthHandler) GetHealth(c *gin.Context) {
+	if h.db == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"status":    "unhealthy",
+			"db":        "down",
+			"timestamp": time.Now().UTC(),
+		})
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
 	defer cancel()
 

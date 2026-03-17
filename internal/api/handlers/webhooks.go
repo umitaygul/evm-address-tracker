@@ -27,6 +27,10 @@ func (h *WebhookHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if h.repo == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db not available"})
+		return
+	}
 	w, err := h.repo.Create(c.Request.Context(), userID, req.URL, req.Secret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -37,6 +41,10 @@ func (h *WebhookHandler) Create(c *gin.Context) {
 
 func (h *WebhookHandler) List(c *gin.Context) {
 	userID := c.GetString("user_id")
+	if h.repo == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db not available"})
+		return
+	}
 	webhooks, err := h.repo.ListByUser(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -53,6 +61,10 @@ func (h *WebhookHandler) Delete(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	if h.repo == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "db not available"})
 		return
 	}
 	if err := h.repo.Delete(c.Request.Context(), id, userID); err != nil {
