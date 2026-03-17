@@ -222,3 +222,15 @@ def verify(secret: str, body: bytes, signature: str) -> bool:
 - Processes up to 20 blocks per poll to avoid falling behind
 - On each block, checks transactions against all watched addresses for the chain
 - If a match is found, fires webhooks for the address owner
+
+## Running Tests
+```bash
+go test ./... -v
+```
+
+## CI/CD
+
+Every push to `main` and every pull request triggers the GitHub Actions workflow automatically.
+
+- Tests run on every PR — green tick means all tests passed
+- Workflow file: `.github/workflows/ci.yml`
